@@ -15,6 +15,7 @@ from .config import RegistryConfig, load_config
 from .editor import create_entry, edit_entry
 from .gitops import GitError, commit as git_commit, diff as git_diff, is_repo, push as git_push, status_short
 from .i18n import Translator, resolve_language, write_language_setting
+from .initializer import init_project
 from .registry import entries, find_entry, load_registry, save_registry
 from .prompts import Choice, autocomplete_select, confirm, press_any_key_to_continue, select, text
 from .render import entry_detail, entry_grid, entry_table, header, print_issues
@@ -29,6 +30,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--lang", choices=["auto", "en", "cs"], help="UI language for this run")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command")
+
+    p_init = sub.add_parser("init", help="Initialize registry.yaml for this project")
+    p_init.add_argument("--force", action="store_true", help="Overwrite generated files when safe")
 
     sub.add_parser("list", help="List registry entries")
     sub.add_parser("validate", help="Validate registry")
@@ -354,6 +358,10 @@ def interactive(config: RegistryConfig, data: dict[str, Any], tr: Translator) ->
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
 
+    if args.command == "init":
+        tr = Translator(resolve_language(args.lang))
+        return init_project(args.config, tr, force=args.force)
+
     if args.command == "language":
         current_tr = Translator(resolve_language(args.lang))
         value = args.value
@@ -369,6 +377,18 @@ def main(argv: list[str] | None = None) -> int:
             console.print(f"[green]✓ {current_tr.t('settings.saved')}[/green]")
             return 0
         return 1
+
+    # Friendly first-run behavior: `jrm` in a project without registry.yaml can
+    # create the configuration immediately instead of failing with a dead end.
+    config_path = Path(args.config).expanduser().resolve()
+    if not args.command and not config_path.exists():
+        tr = Translator(resolve_language(args.lang))
+        console.print(f"[yellow]{tr.t('error.config_missing', path=config_path)}[/yellow]")
+        if confirm(tr.t("init.offer"), default=True):
+            if init_project(config_path, tr) != 0:
+                return 1
+        else:
+            return 1
 
     config, data, tr = _load(args)
 

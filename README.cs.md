@@ -28,7 +28,9 @@ Hodí se například pro seznamy chráněných domén, allowlisty, katalogy slu�
 
 ## Instalace
 
-Po zveřejnění repozitáře na GitHubu je nejpohodlnější `pipx`:
+### Doporučeně přes pipx
+
+Na Fedoře:
 
 ```bash
 sudo dnf install pipx
@@ -36,13 +38,49 @@ pipx ensurepath
 pipx install git+https://github.com/JN5555/json-registry-manager.git
 ```
 
-Poté:
+Otevřete nový terminál a ověřte:
 
 ```bash
 jrm --version
 ```
 
-Pro vývoj:
+Pozdější aktualizace:
+
+```bash
+pipx upgrade json-registry-manager
+```
+
+### Instalace bez pipx
+
+Repozitář obsahuje instalační skript, který vytvoří izolované virtuální prostředí v `~/.local/share/json-registry-manager/` a zpřístupní příkaz přes `~/.local/bin/jrm`:
+
+```bash
+git clone https://github.com/JN5555/json-registry-manager.git
+cd json-registry-manager
+./scripts/install-user.sh
+```
+
+Pokud `~/.local/bin` není v `PATH`, přidejte do `~/.bashrc`:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Aktualizace této instalace:
+
+```bash
+cd /cesta/k/json-registry-manager
+git pull
+./scripts/install-user.sh
+```
+
+Odinstalace:
+
+```bash
+./scripts/uninstall-user.sh
+```
+
+### Vývojová instalace
 
 ```bash
 python -m venv .venv
@@ -51,6 +89,24 @@ python -m pip install -e '.[dev]'
 ```
 
 ## Použití
+
+Pro nový projekt už není nutné psát `registry.yaml` ručně. V adresáři projektu spusťte:
+
+```bash
+jrm init
+```
+
+Průvodce nabídne existující JSON soubory nebo vytvoření nového registru, najde seznam objektů v JSONu, odhadne existující pole a vytvoří `registry.yaml`. Pokud spustíte pouze `jrm` v adresáři bez `registry.yaml`, program vytvoření konfigurace sám nabídne.
+
+Typický začátek nového projektu:
+
+```bash
+mkdir moje-url-aplikace
+cd moje-url-aplikace
+jrm init
+jrm validate
+jrm
+```
 
 V adresáři projektu musí být například:
 

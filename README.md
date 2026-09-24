@@ -33,7 +33,59 @@ The application itself does not know what a bank, domain, server, or media outle
 
 ## Installation
 
-For development from a local clone:
+### Recommended: pipx
+
+On Fedora:
+
+```bash
+sudo dnf install pipx
+pipx ensurepath
+pipx install git+https://github.com/JN5555/json-registry-manager.git
+```
+
+Open a new terminal and verify:
+
+```bash
+jrm --version
+```
+
+Upgrade later:
+
+```bash
+pipx upgrade json-registry-manager
+```
+
+### Without pipx
+
+Clone the repository and use the included user installer. It creates an isolated virtual environment under `~/.local/share/json-registry-manager/` and exposes `jrm` through `~/.local/bin/jrm`:
+
+```bash
+git clone https://github.com/JN5555/json-registry-manager.git
+cd json-registry-manager
+./scripts/install-user.sh
+```
+
+If `~/.local/bin` is not in your `PATH`, add this to `~/.bashrc` and open a new terminal:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To update this installation later:
+
+```bash
+cd /path/to/json-registry-manager
+git pull
+./scripts/install-user.sh
+```
+
+To uninstall:
+
+```bash
+./scripts/uninstall-user.sh
+```
+
+### Development install
 
 ```bash
 python -m venv .venv
@@ -41,19 +93,26 @@ source .venv/bin/activate
 python -m pip install -e '.[dev]'
 ```
 
-For normal installation with `pipx` from GitHub after the repository is published:
-
-```bash
-pipx install git+https://github.com/JN5555/json-registry-manager.git
-```
-
-Upgrade later with:
-
-```bash
-pipx upgrade json-registry-manager
-```
-
 ## Quick start
+
+The easiest way to prepare a new project is now:
+
+```bash
+cd /path/to/your-project
+jrm init
+```
+
+The wizard can use an existing JSON file or create a new one, detect a root list of objects, infer existing fields, and create `registry.yaml`. If you simply run `jrm` in a directory without `registry.yaml`, JRM offers to initialize the project automatically.
+
+Example:
+
+```bash
+mkdir my-url-tool
+cd my-url-tool
+jrm init
+jrm validate
+jrm
+```
 
 A registry project needs two files:
 
@@ -329,10 +388,10 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install git+https://github.com/JN5555/json-registry-manager.git

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 - 2026-09-24
+
+- Added `jrm init` interactive project initializer.
+- Detects existing JSON registries and root object-list keys.
+- Infers existing fields and creates a starter `registry.yaml`.
+- `jrm` now offers initialization when no configuration exists.
+- Added user-level installer/uninstaller scripts for systems without pipx.
+- Version reporting now uses installed package metadata to avoid duplicate version drift.
+- Updated installation documentation and GitHub Actions runner/action versions.
+
 ## 0.1.3 - 2026-09-24
 
 - Added adaptive 1–3 column registry overview for long lists.
