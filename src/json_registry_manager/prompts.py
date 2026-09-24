@@ -5,8 +5,26 @@ from typing import Any
 
 try:
     import questionary as _q
+
+    JRM_STYLE = _q.Style([
+        ("qmark", "fg:#00afff bold"),
+        ("question", "bold"),
+        ("answer", "fg:#87d787 bold"),
+        ("pointer", "fg:#00afff bold"),
+
+        # Aktuálně zvýrazněná položka
+        ("highlighted", "fg:#ffffff bg:#005f87 bold"),
+
+        ("selected", "fg:#87d787"),
+        ("separator", "fg:#808080"),
+        ("instruction", "fg:#808080"),
+        ("text", ""),
+        ("disabled", "fg:#666666 italic"),
+    ])
+
 except Exception:  # pragma: no cover - fallback for minimal environments
     _q = None
+    JRM_STYLE = None
 
 
 @dataclass
@@ -17,7 +35,12 @@ class Choice:
 
 def text(message: str, default: str = "") -> str | None:
     if _q:
-        return _q.text(message, default=default).ask()
+        return _q.text(
+            message,
+            default=default,
+            style=JRM_STYLE,
+        ).ask()
+
     suffix = f" [{default}]" if default else ""
     value = input(f"{message}{suffix}: ")
     return value if value else default
@@ -25,51 +48,96 @@ def text(message: str, default: str = "") -> str | None:
 
 def confirm(message: str, default: bool = False) -> bool | None:
     if _q:
-        return _q.confirm(message, default=default).ask()
+        return _q.confirm(
+            message,
+            default=default,
+            style=JRM_STYLE,
+        ).ask()
+
     hint = "Y/n" if default else "y/N"
     value = input(f"{message} [{hint}]: ").strip().lower()
+
     if not value:
         return default
+
     return value in {"y", "yes", "a", "ano"}
 
 
-def select(message: str, choices: list[Choice], default: Any = None) -> Any:
+def select(
+    message: str,
+    choices: list[Choice],
+    default: Any = None,
+) -> Any:
     if _q:
-        qchoices = [_q.Choice(c.title, value=c.value) for c in choices]
-        return _q.select(message, choices=qchoices, default=default).ask()
+        qchoices = [
+            _q.Choice(c.title, value=c.value)
+            for c in choices
+        ]
+
+        return _q.select(
+            message,
+            choices=qchoices,
+            default=default,
+            style=JRM_STYLE,
+        ).ask()
+
     if message:
         print(message)
+
     for i, choice in enumerate(choices, 1):
         print(f"  {i}. {choice.title}")
+
     while True:
         raw = input("> ").strip()
+
         if not raw and default is not None:
             return default
+
         try:
             idx = int(raw)
             if 1 <= idx <= len(choices):
                 return choices[idx - 1].value
         except ValueError:
             pass
+
         print("Invalid choice.")
 
 
-def autocomplete_select(message: str, choices: list[Choice]) -> Any:
-    """Select from a large list with type-to-filter support when questionary is available."""
+def autocomplete_select(
+    message: str,
+    choices: list[Choice],
+) -> Any:
+    """Select from a large list with type-to-filter support."""
+
     if _q:
-        mapping = {c.title: c.value for c in choices}
+        mapping = {
+            c.title: c.value
+            for c in choices
+        }
+
         answer = _q.autocomplete(
             message,
             choices=list(mapping),
             match_middle=True,
             ignore_case=True,
+            style=JRM_STYLE,
         ).ask()
+
         return mapping.get(answer) if answer is not None else None
-    return select(message, choices=choices)
+
+    return select(
+        message,
+        choices=choices,
+    )
 
 
-def press_any_key_to_continue(message: str = "Press Enter to continue...") -> None:
+def press_any_key_to_continue(
+    message: str = "Press Enter to continue...",
+) -> None:
     if _q:
-        _q.press_any_key_to_continue(message).ask()
+        _q.press_any_key_to_continue(
+            message,
+            style=JRM_STYLE,
+        ).ask()
     else:
         input(message)
