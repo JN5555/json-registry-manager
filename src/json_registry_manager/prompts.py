@@ -8,18 +8,30 @@ try:
 
     JRM_STYLE = _q.Style([
         ("qmark", "fg:#00afff bold"),
-        ("question", "bold"),
+        ("question", "fg:#ffffff bold"),
         ("answer", "fg:#87d787 bold"),
         ("pointer", "fg:#00afff bold"),
 
-        # Aktuálně zvýrazněná položka
+        # Běžné výběrové menu
         ("highlighted", "fg:#ffffff bg:#005f87 bold"),
-
         ("selected", "fg:#87d787"),
+
+        # AUTOCOMPLETE – rozbalovací výsledky při filtrování
+        ("completion-menu.completion", "fg:#e6e6e6 bg:#202428"),
+        ("completion-menu.completion.current", "fg:#ffffff bg:#005f87 bold"),
+
+        # Pokud by autocomplete zobrazoval metadata
+        ("completion-menu.meta.completion", "fg:#bcbcbc bg:#202428"),
+        ("completion-menu.meta.completion.current", "fg:#ffffff bg:#005f87"),
+
+        # Posuvník autocomplete nabídky
+        ("scrollbar.background", "bg:#303438"),
+        ("scrollbar.button", "bg:#70757a"),
+
         ("separator", "fg:#808080"),
-        ("instruction", "fg:#808080"),
-        ("text", ""),
-        ("disabled", "fg:#666666 italic"),
+        ("instruction", "fg:#a0a0a0"),
+        ("text", "fg:#ffffff"),
+        ("disabled", "fg:#707070 italic"),
     ])
 
 except Exception:  # pragma: no cover - fallback for minimal environments
