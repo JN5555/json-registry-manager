@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "json-registry-manager"
+version = "0.1.0"
+description = "Schema-driven interactive CLI for managing, validating, and versioning structured JSON registries."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "JN5555" }
+]
+keywords = ["json", "registry", "cli", "validation", "git", "tui"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "PyYAML>=6.0.2",
+  "questionary>=2.1.0",
+  "rich>=13.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+]
+
+[project.scripts]
+jrm = "json_registry_manager.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/JN5555/json-registry-manager"
+Repository = "https://github.com/JN5555/json-registry-manager"
+Issues = "https://github.com/JN5555/json-registry-manager/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/json_registry_manager"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

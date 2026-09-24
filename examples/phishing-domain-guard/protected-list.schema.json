@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JN5555/json-registry-manager/examples/phishing-domain-guard/protected-list.schema.json",
+  "title": "Phishing Domain Guard protected list",
+  "type": "object",
+  "required": ["entities"],
+  "properties": {
+    "schema": {"type": "integer"},
+    "version": {"type": "string"},
+    "updated": {"type": "string"},
+    "disabledIds": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "category", "domains"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,79}$"},
+          "name": {"type": "string", "minLength": 1},
+          "category": {"enum": ["bank", "finance", "media", "public", "identity", "other"]},
+          "source": {"type": "string"},
+          "domains": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+          "hosts": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "brands": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "version": "2026-09-24",
+  "updated": "2026-09-24",
+  "entities": [
+    {
+      "id": "airbank",
+      "name": "Air Bank",
+      "category": "bank",
+      "source": "ČNB + Air Bank",
+      "domains": [
+        "airbank.cz"
+      ],
+      "hosts": [
+        "ib.airbank.cz"
+      ],
+      "brands": [
+        "airbank",
+        "air bank"
+      ]
+    },
+    {
+      "id": "fio",
+      "name": "Fio banka",
+      "category": "bank",
+      "source": "ČNB + Fio",
+      "domains": [
+        "fio.cz"
+      ],
+      "hosts": [
+        "ib.fio.cz"
+      ],
+      "brands": [
+        "fio",
+        "fio banka",
+        "fiobanka"
+      ]
+    }
+  ],
+  "disabledIds": []
+}
