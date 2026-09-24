@@ -18,11 +18,23 @@ class FieldConfig:
     validator: str | None = None
     unique: bool = False
     default: Any = None
+    help: dict[str, str] | str | None = None
+    example: dict[str, str] | str | None = None
 
     def label_for(self, lang: str) -> str:
         if isinstance(self.label, dict):
             return self.label.get(lang) or self.label.get("en") or self.name
         return self.label or self.name
+
+    def help_for(self, lang: str) -> str | None:
+        if isinstance(self.help, dict):
+            return self.help.get(lang) or self.help.get("en")
+        return self.help
+
+    def example_for(self, lang: str) -> str | None:
+        if isinstance(self.example, dict):
+            return self.example.get(lang) or self.example.get("en")
+        return self.example
 
 
 @dataclass
@@ -68,6 +80,8 @@ def load_config(path: str | Path = "registry.yaml") -> RegistryConfig:
                 validator=cfg.get("validator"),
                 unique=bool(cfg.get("unique", False)),
                 default=cfg.get("default"),
+                help=cfg.get("help"),
+                example=cfg.get("example"),
             )
         )
     return RegistryConfig(

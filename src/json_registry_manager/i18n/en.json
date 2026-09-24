@@ -55,5 +55,7 @@
   "field.current": "Current",
   "field.optional": "optional",
   "generic.yes": "Yes",
-  "generic.no": "No"
+  "generic.no": "No",
+  "prompt.fix_entry": "The entry contains errors. Fix it without losing the entered values?",
+  "result.cancelled": "Changes cancelled."
 }

@@ -144,6 +144,21 @@ Při přidávání položky se zobrazí formulář například pro:
 
 Před uložením je celý registr znovu zvalidován.
 
+U polí s validátorem `hostname` lze vložit i běžnou URL, například:
+
+```text
+https://online.example.cz/login
+online.example.cz/login
+```
+
+JRM ji při interaktivním zadávání automaticky převede na uložený hostname:
+
+```text
+online.example.cz
+```
+
+Pokud validace přesto najde chybu, rozepsaná položka se nezahodí. JRM nabídne opravu se zachováním všech již zadaných hodnot.
+
 ## Git
 
 JRM nepoužívá vlastní přístupový token ke GitHubu. Používá běžný lokální příkaz `git`.
@@ -173,3 +188,28 @@ Ukázková workflow je součástí repozitáře v `.github/workflows/tests.yml`.
 ## Licence
 
 MIT
+
+
+### Nápověda a příklady u polí
+
+Profil může ke každému poli přidat lokalizované vysvětlení a příklad. Jádro JRM tak zůstává univerzální, ale konkrétní formulář může být srozumitelný i netechnickému uživateli.
+
+```yaml
+fields:
+  domains:
+    type: list
+    required: true
+    validator: hostname
+    label:
+      en: Official main domain(s)
+      cs: Oficiální hlavní doména / domény
+    help:
+      en: Main legitimate websites. Full URLs are accepted and normalized.
+      cs: Hlavní legitimní weby služby. Lze vložit i celou URL.
+    example:
+      en: example.com
+      cs: priklad.cz
+```
+
+Interaktivní formulář jasně označí povinná a volitelná pole. Volitelné položky lze přeskočit Enterem.
+

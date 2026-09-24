@@ -55,5 +55,7 @@
   "field.current": "Aktuální",
   "field.optional": "nepovinné",
   "generic.yes": "Ano",
-  "generic.no": "Ne"
+  "generic.no": "Ne",
+  "prompt.fix_entry": "Položka obsahuje chyby. Chcete ji opravit bez ztráty zadaných údajů?",
+  "result.cancelled": "Změny byly zrušeny."
 }

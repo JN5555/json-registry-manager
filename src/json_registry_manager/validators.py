@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import urlsplit
 from dataclasses import dataclass
 from typing import Any
 
@@ -19,7 +20,33 @@ class ValidationIssue:
 
 
 def normalize_hostname(value: str) -> str:
+    """Normalize a hostname already stored in a registry.
+
+    This intentionally does not strip URL paths. Registry validation should still
+    reject values such as ``example.com/login`` when they were written to JSON
+    manually.
+    """
     return value.strip().lower().removeprefix("www.").rstrip(".")
+
+
+def normalize_hostname_input(value: str) -> str:
+    """Turn common user input (hostname or URL) into a hostname.
+
+    Interactive users frequently paste ``https://example.com/login`` or
+    ``example.com/login`` into a field that stores hostnames. Accepting that input
+    is friendly, while the persisted registry remains strict and contains only
+    the hostname.
+    """
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    try:
+        parsed = urlsplit(raw if "://" in raw else f"//{raw}")
+        if parsed.hostname:
+            return normalize_hostname(parsed.hostname)
+    except ValueError:
+        pass
+    return normalize_hostname(raw)
 
 
 def validate_hostname(value: str) -> bool:

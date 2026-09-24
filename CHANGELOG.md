@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.2 - 2026-09-24
+
+- Add localized per-field help and examples driven by `registry.yaml`.
+- Mark fields clearly as required or optional in interactive forms.
+- Replace technical Phishing Domain Guard labels with user-facing wording.
+- Explain optional login/host and protected-name fields directly in the form.
+- Improve category labels for finance-related services.
+
+## 0.1.1 - 2026-09-24
+
+- Accept pasted URLs in hostname fields and store only the hostname.
+- Preserve entered form values when validation fails and offer an in-place correction flow.
+- Show hostname normalization in the interactive editor.
+
 ## 0.1.0 - 2026-09-24
 
 Initial public release.

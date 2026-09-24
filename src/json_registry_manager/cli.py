@@ -108,15 +108,33 @@ def _save_if_valid(config: RegistryConfig, data: dict[str, Any], tr: Translator)
     return True
 
 
+def _candidate_data(config: RegistryConfig, data: dict[str, Any], items: list[dict[str, Any]]) -> dict[str, Any]:
+    candidate = dict(data)
+    candidate[config.items_key] = items
+    return candidate
+
+
 def cmd_add(config: RegistryConfig, data: dict[str, Any], tr: Translator) -> int:
     item = create_entry(config, tr.language)
     if not item:
         return 1
-    entries(config, data).append(item)
-    if not _save_if_valid(config, data, tr):
-        entries(config, data).remove(item)
-        return 1
-    return 0
+
+    while True:
+        candidate_items = [*entries(config, data), item]
+        issues = validate_registry(config, _candidate_data(config, data, candidate_items))
+        if not issues:
+            entries(config, data).append(item)
+            save_registry(config, data)
+            console.print(f"[green]✓ {tr.t('result.saved')}[/green]")
+            return 0
+
+        print_issues(issues, tr)
+        if not confirm(tr.t("prompt.fix_entry"), default=True):
+            console.print(f"[yellow]{tr.t('result.cancelled')}[/yellow]")
+            return 1
+        # Keep everything the user already entered. Pressing Enter on a field keeps
+        # its current value, so only the invalid field needs to be corrected.
+        item = edit_entry(config, tr.language, item)
 
 
 def cmd_edit(config: RegistryConfig, data: dict[str, Any], tr: Translator, entry_id: str) -> int:
@@ -125,12 +143,23 @@ def cmd_edit(config: RegistryConfig, data: dict[str, Any], tr: Translator, entry
         console.print(f"[red]{tr.t('error.not_found', id=entry_id)}[/red]")
         return 1
     index = entries(config, data).index(item)
-    original = dict(item)
-    entries(config, data)[index] = edit_entry(config, tr.language, item)
-    if not _save_if_valid(config, data, tr):
-        entries(config, data)[index] = original
-        return 1
-    return 0
+    updated = edit_entry(config, tr.language, item)
+
+    while True:
+        candidate_items = list(entries(config, data))
+        candidate_items[index] = updated
+        issues = validate_registry(config, _candidate_data(config, data, candidate_items))
+        if not issues:
+            entries(config, data)[index] = updated
+            save_registry(config, data)
+            console.print(f"[green]✓ {tr.t('result.saved')}[/green]")
+            return 0
+
+        print_issues(issues, tr)
+        if not confirm(tr.t("prompt.fix_entry"), default=True):
+            console.print(f"[yellow]{tr.t('result.cancelled')}[/yellow]")
+            return 1
+        updated = edit_entry(config, tr.language, updated)
 
 
 def cmd_remove(config: RegistryConfig, data: dict[str, Any], tr: Translator, entry_id: str, assume_yes: bool = False) -> int:

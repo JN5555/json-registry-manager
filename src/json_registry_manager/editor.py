@@ -5,7 +5,7 @@ import unicodedata
 from typing import Any
 
 from .config import RegistryConfig, FieldConfig
-from .validators import normalize_hostname
+from .validators import normalize_hostname_input
 from .prompts import Choice, select, text
 
 
@@ -17,23 +17,49 @@ def slugify(value: str) -> str:
 
 
 def _label(field: FieldConfig, lang: str) -> str:
-    return field.label_for(lang)
+    label = field.label_for(lang)
+    if field.required:
+        suffix = "povinné" if lang == "cs" else "required"
+    else:
+        suffix = "volitelné – lze přeskočit Enterem" if lang == "cs" else "optional – press Enter to skip"
+    return f"{label} ({suffix})"
+
+
+def _show_field_help(field: FieldConfig, lang: str) -> None:
+    help_text = field.help_for(lang)
+    example = field.example_for(lang)
+    if help_text:
+        print(f"  ℹ {help_text}")
+    if example:
+        prefix = "Příklad" if lang == "cs" else "Example"
+        print(f"  ↳ {prefix}: {example}")
 
 
 def _ask_list(field: FieldConfig, current: list[str] | None, lang: str) -> list[str]:
     existing = current or []
     default = ", ".join(existing)
-    answer = text(f"{_label(field, lang)} (comma separated)", default=default)
+    _show_field_help(field, lang)
+    separator_hint = "oddělte čárkami" if lang == "cs" else "separate with commas"
+    answer = text(f"{_label(field, lang)} – {separator_hint}", default=default)
     if answer is None:
         return existing
     values = [v.strip() for v in answer.split(",") if v.strip()]
     if field.validator == "hostname":
-        values = [normalize_hostname(v) for v in values]
+        normalized = []
+        for value in values:
+            clean = normalize_hostname_input(value)
+            if clean != value.strip().lower():
+                prefix = "Normalizováno" if lang == "cs" else "Normalized"
+                print(f"  ↳ {prefix}: {value} → {clean}")
+            normalized.append(clean)
+        values = normalized
     return list(dict.fromkeys(values))
 
 
 def ask_field(field: FieldConfig, lang: str, current: Any = None, auto_id_from: str | None = None) -> Any:
     label = _label(field, lang)
+    if field.type != "list":
+        _show_field_help(field, lang)
     if field.type == "choice":
         choices = []
         for raw in field.values:

@@ -167,6 +167,30 @@ jrm push
 
 ## Configuration
 
+### Field help and examples
+
+Profiles can provide localized explanations and examples for each field. This keeps the core tool generic while making project-specific forms understandable to non-technical users.
+
+```yaml
+fields:
+  domains:
+    type: list
+    required: true
+    validator: hostname
+    label:
+      en: Official main domain(s)
+      cs: Oficiální hlavní doména / domény
+    help:
+      en: Main legitimate websites. Full URLs are accepted and normalized.
+      cs: Hlavní legitimní weby služby. Lze vložit i celou URL.
+    example:
+      en: example.com
+      cs: priklad.cz
+```
+
+Interactive forms clearly mark required and optional fields. Optional fields can be skipped with Enter.
+
+
 Example `registry.yaml`:
 
 ```yaml
@@ -229,6 +253,8 @@ Supported field types:
 Current built-in validator:
 
 - `hostname`
+
+In the interactive editor, hostname fields also accept pasted URLs such as `https://online.example.com/login` or `online.example.com/login`. JRM normalizes them to `online.example.com` before saving. Registry files themselves remain strict: a manually stored value containing a path still fails validation. If an entry fails validation, the editor keeps all entered values and offers an in-place correction instead of discarding the form.
 
 Options:
 
