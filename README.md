@@ -396,3 +396,8 @@ Registry data is read and written locally. Network access is only performed indi
 ## License
 
 MIT
+
+## Interactive interface
+
+The interactive UI includes an adaptive **Browse entries** view. Long registries are rendered in 1–3 columns depending on terminal width. Large selection lists use type-to-filter autocomplete. Search results are actionable: select a result and choose **Show details**, **Edit**, **Remove**, or **Back**.
+

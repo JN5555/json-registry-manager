@@ -213,3 +213,8 @@ fields:
 
 Interaktivní formulář jasně označí povinná a volitelná pole. Volitelné položky lze přeskočit Enterem.
 
+
+## Interaktivní rozhraní
+
+Interaktivní rozhraní obsahuje adaptivní **Procházet položky**. Dlouhé registry se podle šířky terminálu zobrazí v 1–3 sloupcích. U velkých seznamů se při výběru používá filtrování psaním. Výsledky hledání jsou akční: vyberete položku a zvolíte **Zobrazit detail**, **Upravit**, **Odstranit** nebo **Zpět**.
+

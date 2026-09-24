@@ -57,5 +57,15 @@
   "generic.yes": "Ano",
   "generic.no": "Ne",
   "prompt.fix_entry": "Položka obsahuje chyby. Chcete ji opravit bez ztráty zadaných údajů?",
-  "result.cancelled": "Změny byly zrušeny."
+  "result.cancelled": "Změny byly zrušeny.",
+  "menu.list": "Procházet položky",
+  "prompt.choose_entry_filter": "Začněte psát název nebo ID položky",
+  "prompt.result_action": "Co chcete s položkou udělat?",
+  "prompt.continue": "Stiskněte Enter pro pokračování...",
+  "action.detail": "Zobrazit detail",
+  "action.edit": "Upravit",
+  "action.remove": "Odstranit",
+  "action.back": "Zpět",
+  "result.shown_entries": "Zobrazeno položek: {count}",
+  "result.search_matches": "Nalezeno: {count}"
 }

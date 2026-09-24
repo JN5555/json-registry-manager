@@ -54,6 +54,20 @@ def select(message: str, choices: list[Choice], default: Any = None) -> Any:
         print("Invalid choice.")
 
 
+def autocomplete_select(message: str, choices: list[Choice]) -> Any:
+    """Select from a large list with type-to-filter support when questionary is available."""
+    if _q:
+        mapping = {c.title: c.value for c in choices}
+        answer = _q.autocomplete(
+            message,
+            choices=list(mapping),
+            match_middle=True,
+            ignore_case=True,
+        ).ask()
+        return mapping.get(answer) if answer is not None else None
+    return select(message, choices=choices)
+
+
 def press_any_key_to_continue(message: str = "Press Enter to continue...") -> None:
     if _q:
         _q.press_any_key_to_continue(message).ask()

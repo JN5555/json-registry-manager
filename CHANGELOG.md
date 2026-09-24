@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3 - 2026-09-24
+
+- Added adaptive 1–3 column registry overview for long lists.
+- Added Browse entries to the interactive menu.
+- Large entry selectors now support type-to-filter autocomplete.
+- Search results now offer Detail, Edit, Remove, and Back actions.
+- Added localized entry detail view.
+
 ## 0.1.2 - 2026-09-24
 
 - Add localized per-field help and examples driven by `registry.yaml`.

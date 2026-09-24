@@ -57,5 +57,15 @@
   "generic.yes": "Yes",
   "generic.no": "No",
   "prompt.fix_entry": "The entry contains errors. Fix it without losing the entered values?",
-  "result.cancelled": "Changes cancelled."
+  "result.cancelled": "Changes cancelled.",
+  "menu.list": "Browse entries",
+  "prompt.choose_entry_filter": "Start typing an entry name or ID",
+  "prompt.result_action": "What do you want to do with this entry?",
+  "prompt.continue": "Press Enter to continue...",
+  "action.detail": "Show details",
+  "action.edit": "Edit",
+  "action.remove": "Remove",
+  "action.back": "Back",
+  "result.shown_entries": "Entries shown: {count}",
+  "result.search_matches": "Matches: {count}"
 }

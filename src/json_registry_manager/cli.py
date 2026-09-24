@@ -16,8 +16,8 @@ from .editor import create_entry, edit_entry
 from .gitops import GitError, commit as git_commit, diff as git_diff, is_repo, push as git_push, status_short
 from .i18n import Translator, resolve_language, write_language_setting
 from .registry import entries, find_entry, load_registry, save_registry
-from .prompts import Choice, confirm, press_any_key_to_continue, select, text
-from .render import entry_table, header, print_issues
+from .prompts import Choice, autocomplete_select, confirm, press_any_key_to_continue, select, text
+from .render import entry_detail, entry_grid, entry_table, header, print_issues
 from .validators import validate_registry
 
 console = Console()
@@ -238,16 +238,57 @@ def cmd_push(config: RegistryConfig, tr: Translator) -> int:
         return 1
 
 
-def choose_entry(config: RegistryConfig, data: dict[str, Any], tr: Translator) -> str | None:
-    items = entries(config, data)
-    if not items:
-        return None
-    choices = []
+def _entry_choices(config: RegistryConfig, items: list[dict[str, Any]]) -> list[Choice]:
+    choices: list[Choice] = []
     for item in items:
         entry_id = str(item.get(config.id_field, ""))
         display = str(item.get(config.display_field, entry_id))
-        choices.append(Choice(f"{display}  [{entry_id}]", entry_id))
+        category = str(item.get("category", ""))
+        suffix = f" · {category}" if category else ""
+        choices.append(Choice(f"{display}  [{entry_id}]{suffix}", entry_id))
+    return choices
+
+
+def choose_entry(config: RegistryConfig, data: dict[str, Any], tr: Translator, items: list[dict[str, Any]] | None = None) -> str | None:
+    items = list(items if items is not None else entries(config, data))
+    if not items:
+        return None
+    choices = _entry_choices(config, items)
+    if len(choices) > 18:
+        return autocomplete_select(tr.t("prompt.choose_entry_filter"), choices)
     return select(tr.t("prompt.choose_entry"), choices=choices)
+
+
+def _search_actions(config: RegistryConfig, data: dict[str, Any], tr: Translator, found: list[dict[str, Any]]) -> None:
+    if not found:
+        console.print(tr.t("result.no_matches"))
+        return
+    entry_grid(config, found, tr)
+    console.print(f"[bold]{tr.t('result.search_matches', count=len(found))}[/bold]")
+    entry_id = choose_entry(config, data, tr, found)
+    if not entry_id:
+        return
+    while True:
+        item = find_entry(config, data, entry_id)
+        if not item:
+            return
+        action = select(tr.t("prompt.result_action"), [
+            Choice(tr.t("action.detail"), "detail"),
+            Choice(tr.t("action.edit"), "edit"),
+            Choice(tr.t("action.remove"), "remove"),
+            Choice(tr.t("action.back"), "back"),
+        ])
+        if not action or action == "back":
+            return
+        if action == "detail":
+            entry_detail(config, item, tr)
+            press_any_key_to_continue(tr.t("prompt.continue"))
+        elif action == "edit":
+            cmd_edit(config, data, tr, entry_id)
+            return
+        elif action == "remove":
+            cmd_remove(config, data, tr, entry_id)
+            return
 
 
 def settings_menu(tr: Translator) -> None:
@@ -268,6 +309,7 @@ def interactive(config: RegistryConfig, data: dict[str, Any], tr: Translator) ->
         header(config, data, tr)
         action = select("", [
             Choice(tr.t("menu.add"), "add"),
+            Choice(tr.t("menu.list"), "list"),
             Choice(tr.t("menu.edit"), "edit"),
             Choice(tr.t("menu.remove"), "remove"),
             Choice(tr.t("menu.search"), "search"),
@@ -282,6 +324,8 @@ def interactive(config: RegistryConfig, data: dict[str, Any], tr: Translator) ->
             return 0
         if action == "add":
             cmd_add(config, data, tr)
+        elif action == "list":
+            entry_grid(config, entries(config, data), tr)
         elif action == "edit":
             entry_id = choose_entry(config, data, tr)
             if entry_id:
@@ -293,7 +337,7 @@ def interactive(config: RegistryConfig, data: dict[str, Any], tr: Translator) ->
         elif action == "search":
             query = text(tr.t("prompt.search")) or ""
             found = _matches(config, data, query)
-            entry_table(config, found, tr) if found else console.print(tr.t("result.no_matches"))
+            _search_actions(config, data, tr, found)
         elif action == "validate":
             _validate_and_print(config, data, tr)
         elif action == "diff":
@@ -331,7 +375,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.command:
         return interactive(config, data, tr)
     if args.command == "list":
-        entry_table(config, entries(config, data), tr)
+        entry_grid(config, entries(config, data), tr)
         return 0
     if args.command == "validate":
         return 0 if _validate_and_print(config, data, tr) else 1
@@ -340,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
         if not found:
             console.print(tr.t("result.no_matches"))
             return 1
-        entry_table(config, found, tr)
+        entry_grid(config, found, tr)
         return 0
     if args.command == "add":
         return cmd_add(config, data, tr)
